@@ -4,6 +4,11 @@ const app = express();
 const connectDB =   require('./config/db')
 connectDB();
 const Port = process.env.PORT||5000;
+const userModel = require('./Model/Users');
+app.use(express.json());
+const userRouter = require('./Router/userRouter');
+
+app.use('/api/user',userRouter);
 
 
 app.listen(Port, ()=>{
