@@ -25,10 +25,9 @@ const registerUser = async(req,res) => {
            password : hashPassword,
            phone  
         })
-        const token = jwt.sign({ userId: new_user._id }, secretKey, { expiresIn: '1h' });
+       
         return res.status(201).json({
             user : new_user,
-            token : token,
             message : 'new user created successfully'
         })
      }
@@ -41,5 +40,43 @@ const registerUser = async(req,res) => {
      }
 }
 
+// api to login user
 
-module.exports = registerUser;
+const loginUser = async (req,res) => {
+  
+     const {email,password} = req.body;
+    try{
+      
+        const user = await userModel.findOne({email});
+        if(!user)
+        {
+            return res.status(401).message({
+                message : 'Invalid credential'
+            })
+        }
+        const isPasswordMatch = await bcrypt.compare(password, user.password);
+        if(!isPasswordMatch)
+        {
+            return res.status(401).json({
+                message : 'password does not match'
+            })
+        }
+        const token = jwt.sign({ userId: user._id }, secretKey, { expiresIn: '1h' });
+        return res.status(200).json({
+            user : user,
+            token : token,
+            message : 'user login successfully'
+        })
+    }
+    catch(error)
+    {
+         
+         return res.status(500).json({
+            message : 'An error occured while login',
+            error : error.message
+         })
+    }
+}
+
+
+module.exports = {registerUser,loginUser};
