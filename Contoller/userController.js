@@ -6,7 +6,7 @@ const secretKey = process.env.SECRET_KEY
 const registerUser = async(req,res) => {
 
     const {name,email,password,phone} = req.body;
-    
+    //  console.log(req.body);
      try {
         
         const user = await userModel.findOne({email});
@@ -25,9 +25,10 @@ const registerUser = async(req,res) => {
            password : hashPassword,
            phone  
         })
-       
+        const token = jwt.sign({ userId: new_user._id }, secretKey, { expiresIn: '1h' });
         return res.status(201).json({
             user : new_user,
+            token : token,
             message : 'new user created successfully'
         })
      }
@@ -45,12 +46,13 @@ const registerUser = async(req,res) => {
 const loginUser = async (req,res) => {
   
      const {email,password} = req.body;
+     console.log(req.body);
     try{
       
         const user = await userModel.findOne({email});
         if(!user)
         {
-            return res.status(401).message({
+            return res.status(401).json({
                 message : 'Invalid credential'
             })
         }
