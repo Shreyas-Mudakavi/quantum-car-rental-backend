@@ -48,13 +48,13 @@ const bookCar = async (req,res) => {
 
 const getAvailableCar = async (req,res) => {
 
-    const {startDate,endDate,from_address , to_address,startTime,endTime} = req.body;
+    const {startDate,endDate, fromAddress, toAddress,startTime,endTime} = req.body;
     console.log(req.body)
     try{
 
         const startDateTime = new Date(startDate + 'T' + startTime + 'Z');
         const endDateTime = new Date(endDate + 'T' + endTime + 'Z');
-       
+        console.log(startDateTime,endDateTime);
         const overlappingBookings = await bookingModel.find({
             startDate: { $lte: endDateTime },
             endDate: { $gte:  startDateTime }
