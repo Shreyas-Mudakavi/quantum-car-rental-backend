@@ -25,6 +25,15 @@ const userSchema = new mongoose.Schema({
     address : {
         type : String
     },
+    city : {
+        type : String
+    },
+    state : {
+        type : String
+    },
+    zip : {
+        type : String
+    },
     role : {
         type : String,
         enum : ["admin","user"],

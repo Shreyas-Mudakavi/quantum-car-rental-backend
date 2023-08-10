@@ -25,7 +25,7 @@ const registerUser = async(req,res) => {
            password : hashPassword,
            phone  
         })
-        const token = jwt.sign({ userId: new_user._id }, secretKey, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: new_user._id }, secretKey, { expiresIn: '10h' });
         return res.status(201).json({
             user : new_user,
             token : token,
@@ -46,7 +46,7 @@ const registerUser = async(req,res) => {
 const loginUser = async (req,res) => {
   
      const {email,password} = req.body;
-     console.log(req.body);
+    //  console.log(req.body);
     try{
       
         const user = await userModel.findOne({email});
@@ -63,7 +63,7 @@ const loginUser = async (req,res) => {
                 message : 'password does not match'
             })
         }
-        const token = jwt.sign({ userId: user._id }, secretKey, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: user._id }, secretKey, { expiresIn: '10h' });
         return res.status(200).json({
             user : user,
             token : token,
@@ -80,5 +80,69 @@ const loginUser = async (req,res) => {
     }
 }
 
+const findUser = async(req,res) => {
+    
+    const userId = req.userId;
+ 
+    try{
+   
+        const user = await userModel.findById(userId);
+         
+        if(!user)
+        {
+            return res.status(400).json({
+                message : 'user does not exist with this id',
+            })
+        }
+        return res.status(200).json({
+            message : 'user fetched successfully',
+            user : user
+        })
+    }
+    catch(error)
+    {
+        return res.status(500).json({
+            message : 'An error occured while fetching a particular user',
+            error : error
+        })
+    }
+}
 
-module.exports = {registerUser,loginUser};
+const updateUser = async (req,res) => {
+
+    // console.log('update user api is called');
+
+     const userId = req.userId;
+    //  console.log(req.body);
+    //  const userId = '64d4ab73fb26cd35fd481e79';
+    try{
+
+        const updatedUser = await userModel.findByIdAndUpdate(userId, req.body, {
+            new: true,  
+            runValidators: true,  
+        });
+        
+        if(!updatedUser)
+        {
+            return res.status(404).json({
+                message : 'user does not found'
+            })
+        }
+        return res.status(200).json({
+            message : 'user updated successfully',
+            user : updatedUser
+        })
+    }
+    catch(error)
+    {
+        console.log(error);
+        return res.status(500).json({
+            message : "An occured while updating the user",
+            error : error
+        })
+    }
+
+}
+
+
+module.exports = {registerUser,loginUser,findUser,updateUser};
