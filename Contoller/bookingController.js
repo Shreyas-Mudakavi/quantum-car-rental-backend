@@ -9,13 +9,31 @@ const bookCar = async (req,res) => {
         const startDateTime = new Date(startDate + 'T' + startTime + 'Z');
         const endDateTime = new Date(endDate + 'T' + endTime + 'Z');
         
-             const booked_car = await bookingModel.find({
-                                car: carId,
-                                startDate: { $lte: endDateTime },
-                                endDate: { $gte: startDateTime }
-                            })
+        const booked_car = await bookingModel.find({
+            car: carId,
+            $or: [
+                { 
+                    $and: [
+                        { startDate: { $lt: startDateTime } },   
+                        { endDate: { $gte: startDateTime } }
+                    ]
+                },
+                { 
+                    $and: [
+                        { startDate: { $lt: endDateTime } },    
+                        { endDate: { $gte: endDateTime } }
+                    ]
+                },
+                {
+                    $and: [
+                        { startDate: { $gt: startDateTime } },    
+                        { endDate: { $lt: endDateTime } }
+                    ]
+                }
+            ]
+        });
 
-                            console.log(booked_car);
+        console.log(booked_car);
              if(booked_car.length!==0)
              {
                  return res.status(400).json({
@@ -54,14 +72,32 @@ const getAvailableCar = async (req,res) => {
 
         const startDateTime = new Date(startDate + 'T' + startTime + 'Z');
         const endDateTime = new Date(endDate + 'T' + endTime + 'Z');
-        console.log(startDateTime,endDateTime);
+        
         const overlappingBookings = await bookingModel.find({
-            startDate: { $lte: endDateTime },
-            endDate: { $gte:  startDateTime }
+            $or: [
+                { 
+                    $and: [
+                        { startDate: { $lt: startDateTime } },   
+                        { endDate: { $gte: startDateTime } }
+                    ]
+                },
+                { 
+                    $and: [
+                        { startDate: { $lt: endDateTime } },    
+                        { endDate: { $gte: endDateTime } }
+                    ]
+                },
+                {
+                    $and: [
+                        { startDate: { $gt: startDateTime } },    
+                        { endDate: { $lt: endDateTime } }
+                    ]
+                }
+            ]
         });
-        console.log(overlappingBookings);
+        // console.log(overlappingBookings);
         const bookedCarIds = overlappingBookings.map(booking => booking.car);
-         console.log(bookedCarIds);
+        //  console.log(bookedCarIds);
         const availableCars = await carModel.find({
             _id: { $nin: bookedCarIds }
         });
