@@ -16,7 +16,7 @@ const addCar = async(req,res) => {
     {
          return res.staus(500).json({
             message : 'internal server error',
-            error : error
+            error : error.message
          })
     }
 
@@ -42,10 +42,10 @@ const getCar = async(req,res) => {
     }
     catch(error)
     {
-        console.log(error);
+        // console.log(error);
         return res.status(500).json({
             message : 'An error occured while fetching the car',
-            error : error
+            error : error.message
         })
     }
 }
@@ -71,7 +71,7 @@ const findCarDetails = async(req,res) =>{
          }
          catch(error)
          {
-             console.log(error);
+            //  console.log(error.message);
              return res.status(500).json({
                 message : 'An error occured while fetching the car',
                 error : error.message

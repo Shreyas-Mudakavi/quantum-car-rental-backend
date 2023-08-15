@@ -6,7 +6,7 @@ const secretKey = process.env.SECRET_KEY
 const registerUser = async(req,res) => {
 
     const {name,email,password,phone} = req.body;
-    //  console.log(req.body);
+     console.log(req.body);
      try {
         
         const user = await userModel.findOne({email});
@@ -103,7 +103,7 @@ const findUser = async(req,res) => {
     {
         return res.status(500).json({
             message : 'An error occured while fetching a particular user',
-            error : error
+            error : error.message
         })
     }
 }
@@ -135,10 +135,10 @@ const updateUser = async (req,res) => {
     }
     catch(error)
     {
-        console.log(error);
+        // console.log(error);
         return res.status(500).json({
             message : "An occured while updating the user",
-            error : error
+            error : error.message
         })
     }
 
