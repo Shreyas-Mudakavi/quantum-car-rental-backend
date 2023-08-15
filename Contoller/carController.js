@@ -2,7 +2,6 @@ const carModel = require('../Model/Cars');
 
 const addCar = async(req,res) => {
 
-    console.log(req.body);
     try{
         
         const carData = req.body;
@@ -24,8 +23,7 @@ const addCar = async(req,res) => {
 }
 
 const getCar = async(req,res) => {
-    console.log('pankaj');
-
+     
     try{
        
          const cars = await carModel.find({});
@@ -52,4 +50,33 @@ const getCar = async(req,res) => {
     }
 }
 
-module.exports = {addCar,getCar};
+const findCarDetails = async(req,res) =>{
+
+         console.log('does it call');
+         
+         try{
+           
+            const carId = req.query.id;
+            const car = await carModel.findById(carId);
+             if(!car)
+             {
+                return res.status(404).json({
+                    message : 'car with this id does not exist'
+                })
+             }
+             return res.status(200).json({
+                message : 'car fetched successfully',
+                car : car
+             })
+         }
+         catch(error)
+         {
+             console.log(error);
+             return res.status(500).json({
+                message : 'An error occured while fetching the car',
+                error : error.message
+             })
+         }
+}
+
+module.exports = {addCar,getCar,findCarDetails};

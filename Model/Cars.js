@@ -12,10 +12,6 @@ const carSchema = new mongoose.Schema({
     price : {
         type : Number
     },
-    booked : {
-        type : Boolean,
-        default : false
-    },
     image : {
         type : String
     },
@@ -24,6 +20,21 @@ const carSchema = new mongoose.Schema({
     },
     noOfSeat : {
         type : Number
+    },
+    rating : {
+        type : Number
+    },
+    speed : {
+        type : String
+    },
+    gps : {
+        type : String
+    },
+    seatType : {
+        type : String
+    },
+    automatic : {
+        type : String
     }
 
 })
