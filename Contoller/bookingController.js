@@ -34,36 +34,33 @@ const bookCar = async (req,res) => {
             ]
         });
 
-        console.log(booked_car);
-             if(booked_car.length!==0)
-             {
-                 return res.status(400).json({
-                    message : 'car is already booked'
-                 })
-             }
-             const booking = new bookingModel({
-                car : carId,
-                user : userId,
-                startDate : startDateTime,
-                endDate : endDateTime
-             })
-             const new_car = await booking.save();
-             return res.status(200).json({
-                message : 'car booked successfully',
-                newCar : new_car
-             })
+    console.log(booked_car);
+    if (booked_car.length !== 0) {
+      return res.status(400).json({
+        message: "car is already booked",
+      });
     }
-        
-    catch(error){
-       
-        console.log(error);
-        return res.status(500).json({
-            message : "An error occured while booking an car",
-            error : error   
-        })
-    }
+    const booking = new bookingModel({
+      car: carId,
+      user: userId,
+      startDate: startDateTime,
+      endDate: endDateTime,
+    });
+    const new_car = await booking.save();
+    return res.status(200).json({
+      message: "car booked successfully",
+      newCar: new_car,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "An error occured while booking an car",
+      error: error,
+    });
+  }
+};
 
-}
+
 
 const getAvailableCar = async (req,res) => {
 
@@ -124,8 +121,9 @@ const getAvailableCar = async (req,res) => {
             error : error 
         })
     }
-
 }
+
+
 
 const calculateFare = async(req,res) =>{
 
