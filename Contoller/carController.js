@@ -19,7 +19,7 @@ const addCar = async (req, res) => {
 
 const getCar = async (req, res) => {
   try {
-    const cars = await carModel.find({});
+    const cars = await carModel.find({}).sort({ price: 1 });
     console.log(cars);
     if (!cars || cars.length === 0) {
       return res.staus(400).json({
