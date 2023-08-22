@@ -19,12 +19,17 @@ const addCar = async (req, res) => {
 
 const getCar = async (req, res) => {
   try {
+
     const cars = await carModel.find({}).sort({ price: 1 });
-    console.log(cars);
+
     if (!cars || cars.length === 0) {
       return res.staus(400).json({
         message: "No cars found!",
       });
+    }
+    if(req.query.sort === 'desc')
+    {
+        cars.reverse();
     }
     res.status(200).json({
       message: "here is all car",
