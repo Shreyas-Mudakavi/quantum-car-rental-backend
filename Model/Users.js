@@ -36,11 +36,14 @@ const userSchema = new mongoose.Schema({
     },
     role : {
         type : String,
-        enum : ["admin","user"],
         default : 'user'
     }
 
 }, {timestamps: true})
+
+userSchema.methods.comparePassword = async function (enteredPassword) {
+    return await bcrypt.compare(enteredPassword, this.password);
+  };
 
 const userModel = mongoose.model('userModel', userSchema);
 module.exports = userModel;

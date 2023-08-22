@@ -10,11 +10,13 @@ app.use(express.json());
 const userRouter = require('./Router/userRouter');
 const carRoute = require('./Router/carRoute');
 const bookingModel = require('./Model/Booking');
+const adminRoute = require('./Router/adminRoute');
 // console.log(bookingModel);
 app.use(cors());
 
 app.use('/api/user',userRouter);
 app.use('/api/car',carRoute);
+app.use('/api/admin',adminRoute);
 
 
 app.listen(Port, ()=>{

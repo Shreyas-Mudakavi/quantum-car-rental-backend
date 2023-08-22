@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const secretKey = process.env.SECRET_KEY
 const registerUser = async(req,res) => {
 
-    const {name,email,password,phone} = req.body;
+    const {name,email,password,phone,role} = req.body;
      console.log(req.body);
      try {
         
@@ -23,7 +23,8 @@ const registerUser = async(req,res) => {
             name,
             email,
            password : hashPassword,
-           phone  
+           phone ,
+           role
         })
         const token = jwt.sign({ userId: new_user._id }, secretKey, { expiresIn: '10h' });
         return res.status(201).json({

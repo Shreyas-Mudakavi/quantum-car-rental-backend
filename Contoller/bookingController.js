@@ -1,5 +1,6 @@
 const bookingModel = require('../Model/Booking');
 const carModel = require('../Model/Cars');
+const mongoose = require('mongoose');
 
 const bookCar = async (req,res) => {
 
@@ -95,20 +96,29 @@ const getAvailableCar = async (req,res) => {
                 }
             ]
         });
-        // console.log(overlappingBookings);
+         console.log(overlappingBookings);
+
         const bookedCarIds = overlappingBookings.map(booking => booking.car);
-        //  console.log(bookedCarIds);
+         
         const availableCars = await carModel.find({
             _id: { $nin: bookedCarIds }
         });
 
+        const unAvailableCar = await carModel.find({
+            _id: { $in: bookedCarIds }
+        });
+        
+        
         res.status(200).json({
             message: 'Available cars fetched successfully',
-            availableCars: availableCars
+            availableCars: availableCars,
+            unAvailableCar : unAvailableCar
+            
         });
     }
     catch(error)
     {
+        console.log(error);
         return res.status(500).json({
             message : 'An error occured while fetching non booked car',
             error : error 
@@ -117,4 +127,32 @@ const getAvailableCar = async (req,res) => {
 
 }
 
-module.exports = {bookCar,getAvailableCar}
+const calculateFare = async(req,res) =>{
+
+    const {name,email,phone,no_of_person,luggage_info , startDate , endDate , startTime , endTime,carId} = req.body
+    try{
+       
+        const car = await carModel.findById(carId);
+        console.log(car);
+        const price = car.price;
+        const journeyStartDateTime = new Date(startDate + 'T' + startTime + 'Z');
+        const journeyEndDateTime   = new Date(endDate + 'T' + endTime + 'Z');
+        const timeDifferenceMilliseconds = journeyEndDateTime - journeyStartDateTime;
+       const days = timeDifferenceMilliseconds / (1000 * 60 * 60*24);
+         const total = days*price;
+         return res.status(200).json({
+            message : 'price calculated successfully',
+            total : total
+         })
+    }
+    catch(err)
+    {
+        return res.status(500).json({
+            message : 'An error occured while calculating the fare',
+            error : err
+        })
+    }
+
+}
+
+module.exports = {bookCar,getAvailableCar,calculateFare};

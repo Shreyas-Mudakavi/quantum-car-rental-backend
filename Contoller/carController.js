@@ -26,8 +26,8 @@ const getCar = async(req,res) => {
      
     try{
        
-         const cars = await carModel.find({});
-         console.log(cars);
+         const cars = await carModel.find({}).sort({ price: 1 });
+         
          if(!cars || cars.length === 0)
          {
             return res.staus(400).json({
@@ -52,7 +52,7 @@ const getCar = async(req,res) => {
 
 const findCarDetails = async(req,res) =>{
 
-         console.log('does it call');
+         
          
          try{
            
@@ -77,6 +77,38 @@ const findCarDetails = async(req,res) =>{
                 error : error.message
              })
          }
+}
+
+const updateCar = async(req,res) => {
+    
+    console.log(req.body);
+    const carId = req.query.carId;
+    try{
+      
+        const updatedCar = await carModel.findByIdAndUpdate(carId, req.body,{
+            new : true,
+            runValidators: true,  
+        })
+      if(!updateCar)
+      {
+         return res.status(404).json({
+            message : 'did not find the car'
+         })
+      }
+
+      return res.status(200).json({
+        message : 'car updated successfullt',
+        car : updatedCar
+      })
+
+    }
+    catch(err)
+    {
+          return res.status(500).json({
+            message : 'An error occured while updating the car',
+            error : err 
+          })
+    }
 }
 
 module.exports = {addCar,getCar,findCarDetails};

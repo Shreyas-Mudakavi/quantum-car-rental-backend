@@ -35,6 +35,9 @@ const carSchema = new mongoose.Schema({
     },
     automatic : {
         type : String
+    },
+    brand : {
+        type : String
     }
 
 })
