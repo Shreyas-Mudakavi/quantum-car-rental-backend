@@ -59,6 +59,7 @@ const findCarDetails = async (req, res) => {
         message: "Car not found!",
       });
     }
+    console.log(car);
     res.status(200).json({
       message: "car fetched successfully",
       car: car,
