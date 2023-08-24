@@ -3,6 +3,7 @@ const userModel = require('../Model/Users');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv').config();
 const bcrypt = require('bcrypt');
+const { s3Uploadv2 } = require("../utils/s3");
 const secretKey = process.env.SECRET_KEY
 
 
@@ -114,4 +115,13 @@ const getAllUsers = async (req, res, next) => {
     });
   };
 
-  module.exports = {getAllUsers,adminLogin, getUser,deleteUser,getProfile};
+   const postSingleImage =async (req, res, next) => {
+    const file = req.file;
+    // if (!file) return next(new ErrorHandler("Invalid Image", 401));
+   
+    const results = await s3Uploadv2(file);
+    const location = results.Location && results.Location;
+    return res.status(201).json({ data: { location } });
+  };
+
+  module.exports = {getAllUsers,adminLogin, getUser,deleteUser,getProfile, postSingleImage};
