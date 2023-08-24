@@ -56,45 +56,45 @@ const loginUser = async (req, res) => {
         message: "Email or password is incorrect.",
       });
     }
-}
-    catch(error)
-    {
-         
-         return res.status(500).json({
-            message : 'An error occured while login',
-            error : error.message
-         })
-    }
-}
 
+    const token = jwt.sign({ userId: user._id }, secretKey, {
+      expiresIn: "10h",
+    });
 
-const findUser = async(req,res) => {
-    
-    const userId = req.userId;
- 
-    try{
-   
-        const user = await userModel.findById(userId);
-         
-        if(!user)
-        {
-            return res.status(400).json({
-                message : 'user does not exist with this id',
-            })
-        }
-        return res.status(200).json({
-            message : 'user fetched successfully',
-            user : user
-        })
+    res.status(201).json({
+      user: user,
+      token: token,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "An error occured while login",
+      error: error.message,
+    });
+  }
+};
+
+const findUser = async (req, res) => {
+  const userId = req.userId;
+
+  try {
+    const user = await userModel.findById(userId);
+
+    if (!user) {
+      return res.status(400).json({
+        message: "user does not exist with this id",
+      });
     }
-    catch(error)
-    {
-        return res.status(500).json({
-            message : 'An error occured while fetching a particular user',
-            error : error.message
-        })
-    }
-}
+    return res.status(200).json({
+      message: "user fetched successfully",
+      user: user,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "An error occured while fetching a particular user",
+      error: error.message,
+    });
+  }
+};
 
 const updateUser = async (req, res) => {
   // console.log('update user api is called');
