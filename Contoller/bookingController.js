@@ -398,6 +398,83 @@ const acceptHireAgree = async (req, res, next) => {
   }
 };
 
+const findAllBooking = async (req,res) => {
+
+  try{
+
+    const bookings = await bookingModel.find({}).populate('user').populate('car');
+    return res.status(200).json({
+      message : 'here is all booking',
+      bookings : bookings
+    })
+  }
+  catch(err)
+  {
+    console.log(err);
+     return res.status(500).json({
+      message : 'An error occured while fetching the booking',
+      error : err.messsage
+     })
+  }
+
+}
+
+const getBooking = async (req, res) => {
+  try {
+    const id = req.params.id;
+    console.log('order', id);
+    
+    // Await the promise returned by bookingModel.findById(id)
+    const booking = await bookingModel.findById(id).populate('user');
+
+    if (!booking) {
+      return res.status(404).json({
+        message: 'Booking not found'
+      });
+    }
+
+    return res.status(200).json({
+      message: 'Booking fetched successfully',
+      booking: booking
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: 'An error occurred while fetching the booking',
+      error: error.message
+    });
+  }
+};
+
+const deleteBooking = async (req,res) =>{
+
+  try {
+    const bookingId = req.params.id;
+    // console.log('booking id', bookingId);
+    
+    const deletedBooking = await bookingModel.findByIdAndDelete(bookingId);
+    
+    if (!deleteBooking) {
+      return res.status(404).json({
+        message: 'booking not found'
+      });
+    }
+    
+    return res.status(200).json({
+      message: 'booking deleted',
+      booking: deletedBooking
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: 'An error occurred while deleting the booking',
+      error: error.message
+    });
+  }
+
+}
+
+
 module.exports = {
   bookCar,
   getAvailableCar,
@@ -408,4 +485,7 @@ module.exports = {
   getAllBookingHistory,
   acceptHireAgree,
   getBookingHistory,
+  findAllBooking,
+  getBooking,
+  deleteBooking
 };

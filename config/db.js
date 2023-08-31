@@ -2,9 +2,12 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv').config('')
 const uri = process.env.MONGO_URI;
 
+
 const connectDB = async () => {
 
+console.log(uri);
      try{
+      mongoose.set('strictQuery',false)
         const conn = await mongoose.connect(uri);
         console.log(`database is conected successfully`);
      }

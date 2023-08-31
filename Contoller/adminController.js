@@ -103,19 +103,34 @@ const getAllUsers = async (req, res, next) => {
 
    const getProfile = async (req, res, next) => {
 
-     const userId = '64dcb5b70a1e352017f0f562'
-  
-    const user = await userModel.findById(userId);
-    if (!user) {
-      return next(new ErrorHandler("User not found.", 400));
-    }
-  
-    res.status(200).json({
-      user,
-    });
+     
+     const userId =  req.params.id;
+
+     try{
+
+      const user = await userModel.findById(userId);
+      // console.log(user);
+      if (!user) {
+        return next(new ErrorHandler("User not found.", 400));
+      }
+
+      return  res.status(200).json({
+        user,
+      });
+
+     }
+     catch(error)
+     {
+          return res.status(500).json({
+            message : 'An error occured while fetching user profile',
+            error : error.message
+          })
+     }
+
   };
 
-   const postSingleImage =async (req, res, next) => {
+
+  const postSingleImage =async (req, res, next) => {
     const file = req.file;
     // if (!file) return next(new ErrorHandler("Invalid Image", 401));
    

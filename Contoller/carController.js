@@ -35,31 +35,34 @@ const addCar = async (req, res) => {
 };
 
 const getCar = async (req, res) => {
+  console.log('does it call')
   try {
     let cars;
-    if (req.query.sort === "low") {
-      cars = await carModel.find({}).sort({ price: 1 });
-    }
+    // if (req.query.sort === "low") {
+    //   cars = await carModel.find({}).sort({ price: 1 });
+    // }
 
-    if (req.query.sort === "high") {
-      cars = await carModel.find({}).sort({ price: -1 });
-    }
+    // if (req.query.sort === "high") {
+    //   cars = await carModel.find({}).sort({ price: -1 });
+    // }
+
+    cars = await carModel.find({}).sort({ price: 1 });
 
     if (!cars || cars.length === 0) {
-      return res.staus(400).json({
+      return res.status(400).json({
         message: "No cars found!",
       });
     }
-    // if(req.query.sort === 'desc')
-    // {
-    //     cars.reverse();
-    // }
+    if(req.query.sort === 'desc')
+    {
+        cars.reverse();
+    }
     res.status(200).json({
       message: "here is all car",
       cars: cars,
     });
   } catch (error) {
-    // console.log(error);
+    console.log(error);
     return res.status(500).json({
       message: "An error occured while fetching the car",
       error: error.message,
