@@ -7,11 +7,13 @@ const {
   getAllBookingHistory,
   acceptHireAgree,
   getBookingHistory,
+  checkAvailability,
 } = require("../Contoller/bookingController");
 const auth = require("../Middleware/auth");
 
 const router = express.Router();
 
+router.post("/check-availability", auth, checkAvailability);
 router.post("/calculate-total", auth, calculateFare);
 router.post("/create-booking", auth, createBooking);
 router.post("/capture-payment/:orderId", auth, capturePayment);

@@ -121,6 +121,61 @@ const getAvailableCar = async (req, res) => {
   }
 };
 
+const checkAvailability = async (req, res) => {
+  const { startDate, endDate, startTime, endTime, carId } = req.body;
+  // console.log(req.body);
+  try {
+    const startDateTime = new Date(startDate + "T" + startTime + "Z");
+    const endDateTime = new Date(endDate + "T" + endTime + "Z");
+
+    const overlappingBookings = await bookingModel.find({
+      $or: [
+        {
+          $and: [
+            { startDate: { $lt: startDateTime } },
+            { endDate: { $gte: startDateTime } },
+          ],
+        },
+        {
+          $and: [
+            { startDate: { $lt: endDateTime } },
+            { endDate: { $gte: endDateTime } },
+          ],
+        },
+        {
+          $and: [
+            { startDate: { $gt: startDateTime } },
+            { endDate: { $lt: endDateTime } },
+          ],
+        },
+      ],
+    });
+
+    const bookedCar = overlappingBookings.filter(
+      (booking) => booking.car.toString() === carId
+    );
+
+    // console.log("not avaaa  ", bookedCar);
+    if (bookedCar.length > 0) {
+      return res.status(200).json({
+        message: "Car is booked! Please try with different date and time.",
+        success: false,
+      });
+    } else {
+      return res.status(200).json({
+        message: "Car is available!",
+        success: true,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "An error occured while fetching non booked car",
+      error: error,
+    });
+  }
+};
+
 const calculateFare = async (req, res) => {
   const {
     name,
@@ -408,4 +463,5 @@ module.exports = {
   getAllBookingHistory,
   acceptHireAgree,
   getBookingHistory,
+  checkAvailability,
 };
