@@ -13,6 +13,7 @@ const bookingRoute = require("./Router/bookingRoute");
 const bookingModel = require("./Model/Booking");
 const adminRoute = require("./Router/adminRoute");
 const locationRoutes = require("./Router/locationRoutes");
+const queryRoutes = require("./Router/queryRoute");
 // console.log(bookingModel);
 app.use(cors());
 
@@ -20,6 +21,7 @@ app.use("/api/user", userRouter);
 app.use("/api/location", locationRoutes);
 app.use("/api/car", carRoute);
 app.use("/api/booking", bookingRoute);
+app.use("/api/query", queryRoutes);
 app.use("/api/admin", adminRoute);
 
 app.get("/", (req, res, next) => {

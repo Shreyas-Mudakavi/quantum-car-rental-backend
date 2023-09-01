@@ -5,29 +5,35 @@ const dotenv = require("dotenv").config();
 const bcrypt = require("bcrypt");
 const { s3Uploadv2 } = require("../utils/s3");
 const bookingModel = require("../Model/Booking");
+const carModel = require("../Model/Cars");
+const locationModel = require("../Model/Location");
+const transactionModel = require("../Model/Transaction");
 const secretKey = process.env.SECRET_KEY;
 
 const getAllUsers = async (req, res, next) => {
-  console.log(req.query);
-  const userCount = await userModel.countDocuments();
-  console.log("userCount", userCount);
+  try {
+    const userCount = await userModel.countDocuments();
+    console.log("userCount", userCount);
 
-  const apiFeature = new APIFeatures(
-    userModel.find().sort({ createdAt: -1 }),
-    req.query
-  ).search("name");
+    const apiFeature = new APIFeatures(
+      userModel.find().sort({ createdAt: -1 }),
+      req.query
+    ).search("name");
 
-  let users = await apiFeature.query;
-  console.log("users", users);
-  let filteredUserCount = users.length;
-  if (req.query.resultPerPage && req.query.currentPage) {
-    apiFeature.pagination();
+    let users = await apiFeature.query;
+    let filteredUserCount = users.length;
+    if (req.query.resultPerPage && req.query.currentPage) {
+      apiFeature.pagination();
 
-    console.log("filteredUserCount", filteredUserCount);
-    users = await apiFeature.query.clone();
+      console.log("filteredUserCount", filteredUserCount);
+      users = await apiFeature.query.clone();
+    }
+    res.status(200).json({ users, userCount, filteredUserCount });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
-  console.log("users", users);
-  res.status(200).json({ users, userCount, filteredUserCount });
 };
 
 const adminLogin = async (req, res) => {
@@ -75,13 +81,21 @@ const getUser = async (req, res) => {
 };
 const deleteUser = async (req, res, next) => {
   const { id } = req.params;
-  const user = await userModel.findOneAndDelete({ _id: id });
-
+  const user = await userModel.findById(id);
   if (!user) {
     return next(new ErrorHandler("User Not found", 404));
   }
+  await userModel.findByIdAndDelete(id);
 
-  await user.remove();
+  const userBooking = await bookingModel.find({ user: id });
+  if (userBooking || userBooking?.length > 0) {
+    await bookingModel.deleteMany(userBooking?._id);
+  }
+
+  const userTransaction = await transactionModel.find({ user: id });
+  if (userTransaction || userTransaction?.length > 0) {
+    await transactionModel.deleteMany(userTransaction?._id);
+  }
 
   res.status(200).json({
     message: "User Deleted Successfully.",
@@ -121,7 +135,6 @@ const postSingleImage = async (req, res, next) => {
 const adminUpdateUser = async (req, res) => {
   // console.log('update user api is called');
 
-  //  console.log(req.body);
   //  const userId = '64d4ab73fb26cd35fd481e79';
   try {
     const updatedUser = await userModel.findByIdAndUpdate(
@@ -138,7 +151,7 @@ const adminUpdateUser = async (req, res) => {
         message: "user does not found",
       });
     }
-    return res.status(200).json({
+    res.status(200).json({
       message: "user updated successfully",
       user: updatedUser,
     });
@@ -148,6 +161,91 @@ const adminUpdateUser = async (req, res) => {
       message: "An occured while updating the user",
       error: error.message,
     });
+  }
+};
+
+const getAllCars = async (req, res, next) => {
+  try {
+    const carCount = await carModel.countDocuments();
+
+    const apiFeature = new APIFeatures(
+      carModel.find().sort({ createdAt: -1 }),
+      req.query
+    ).search("name");
+
+    let cars = await apiFeature.query;
+    let filteredCarCount = cars.length;
+    if (req.query.resultPerPage && req.query.currentPage) {
+      apiFeature.pagination();
+
+      cars = await apiFeature.query.clone();
+    }
+    res.status(200).json({ cars, carCount, filteredCarCount });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
+  }
+};
+
+const getAllBookings = async (req, res, next) => {
+  try {
+    let query = {};
+
+    if (req.query.status !== "all") query.status = req.query.status;
+
+    const bookingCount = await bookingModel.countDocuments();
+
+    const apiFeature = new APIFeatures(
+      bookingModel
+        .find(query)
+        .sort({ createdAt: -1 })
+        .populate("user")
+        .populate("car"),
+      req.query
+    );
+    // ).search("name");
+
+    let bookings = await apiFeature.query;
+    let filteredBookingCount = bookings.length;
+    if (req.query.resultPerPage && req.query.currentPage) {
+      apiFeature.pagination();
+
+      bookings = await apiFeature.query.clone();
+    }
+    res.status(200).json({ bookings, bookingCount, filteredBookingCount });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
+  }
+};
+
+const deleteLocation = async (req, res, next) => {
+  const locationType = req.query.type;
+
+  try {
+    const location = await locationModel.findOne();
+
+    if (locationType === "pickup") {
+      await locationModel.updateMany({
+        $pull: {
+          pickupLocations: req.params.name,
+        },
+      });
+    } else {
+      await locationModel.updateMany({
+        $pull: {
+          dropOffLocations: req.params.name,
+        },
+      });
+    }
+
+    res.status(200).json({ message: "Deleted location!" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 };
 
@@ -171,6 +269,15 @@ const getStatistics = async (req, res, next) => {
       },
     ]);
 
+    const transactions = await transactionModel.aggregate([
+      {
+        $group: {
+          _id: null,
+          total: { $sum: 1 },
+        },
+      },
+    ]);
+
     const bookings = await bookingModel.aggregate([
       {
         $group: {
@@ -182,13 +289,13 @@ const getStatistics = async (req, res, next) => {
     const payments = await bookingModel.aggregate([
       {
         $project: {
-          amount: 1,
+          totalPrice: 1,
         },
       },
       {
         $group: {
           _id: null,
-          total: { $sum: "$amount" },
+          total: { $sum: "$totalPrice" },
         },
       },
     ]);
@@ -214,6 +321,29 @@ const getStatistics = async (req, res, next) => {
       },
       { $sort: { _id: 1 } },
     ]);
+
+    const dailyTransactions = await transactionModel.aggregate([
+      {
+        $project: {
+          month: { $month: "$createdAt" },
+
+          year: { $year: "$createdAt" },
+        },
+      },
+      {
+        $match: {
+          year: year,
+        },
+      },
+      {
+        $group: {
+          _id: "$month",
+          total: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
     const dailyBookings = await bookingModel.aggregate([
       {
         $project: {
@@ -242,7 +372,7 @@ const getStatistics = async (req, res, next) => {
           month: { $month: "$createdAt" },
 
           year: { $year: "$createdAt" },
-          amount: 1,
+          totalPrice: 1,
         },
       },
       {
@@ -253,18 +383,21 @@ const getStatistics = async (req, res, next) => {
       {
         $group: {
           _id: "$month",
-          total: { $sum: "$amount" },
+          total: { $sum: "$totalPrice" },
         },
       },
       { $sort: { _id: 1 } },
     ]);
+
     return res.send({
       users: users,
+      transactions: transactions,
       payments: payments,
       bookings: bookings,
       dailyUsers,
       dailyBookings,
       dailyPayments,
+      dailyTransactions,
     });
   }
   if (time == "daily") {
@@ -286,6 +419,24 @@ const getStatistics = async (req, res, next) => {
         },
       },
     ]);
+    const transactions = await transactionModel.aggregate([
+      {
+        $match: {
+          $expr: {
+            $gt: [
+              "$createdAt",
+              { $dateSubtract: { startDate: date, unit: "day", amount: 1 } },
+            ],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: 1 },
+        },
+      },
+    ]);
     const bookings = await bookingModel.aggregate([
       {
         $match: {
@@ -310,7 +461,9 @@ const getStatistics = async (req, res, next) => {
           $expr: {
             $gt: [
               "$createdAt",
-              { $dateSubtract: { startDate: date, unit: "day", amount: 1 } },
+              {
+                $dateSubtract: { startDate: date, unit: "day", totalPrice: 1 },
+              },
             ],
           },
         },
@@ -318,12 +471,32 @@ const getStatistics = async (req, res, next) => {
       {
         $group: {
           _id: null,
-          total: { $sum: "$amount" },
+          total: { $sum: "$totalPrice" },
         },
       },
     ]);
 
     const dailyUsers = await userModel.aggregate([
+      {
+        $match: {
+          $expr: {
+            $gt: [
+              "$createdAt",
+              { $dateSubtract: { startDate: date, unit: "day", amount: 6 } },
+            ],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          total: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    const dailyTransactions = await transactionModel.aggregate([
       {
         $match: {
           $expr: {
@@ -367,7 +540,9 @@ const getStatistics = async (req, res, next) => {
           $expr: {
             $gt: [
               "$createdAt",
-              { $dateSubtract: { startDate: date, unit: "day", amount: 6 } },
+              {
+                $dateSubtract: { startDate: date, unit: "day", totalPrice: 6 },
+              },
             ],
           },
         },
@@ -375,7 +550,7 @@ const getStatistics = async (req, res, next) => {
       {
         $group: {
           _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
-          total: { $sum: "$amount" },
+          total: { $sum: "$totalPrice" },
         },
       },
       { $sort: { _id: 1 } },
@@ -383,11 +558,13 @@ const getStatistics = async (req, res, next) => {
 
     return res.send({
       users: users,
+      transactions: transactions,
       payments: payments,
       bookings: bookings,
       dailyUsers,
       dailyBookings,
       dailyPayments,
+      dailyTransactions,
     });
   }
   if (time == "weekly") {
@@ -412,13 +589,12 @@ const getStatistics = async (req, res, next) => {
         },
       },
     ]);
-    const payments = await bookingModel.aggregate([
+    const transactions = await transactionModel.aggregate([
       {
         $project: {
           week: { $week: "$createdAt" },
 
           year: { $year: "$createdAt" },
-          amount: 1,
         },
       },
       {
@@ -430,7 +606,29 @@ const getStatistics = async (req, res, next) => {
       {
         $group: {
           _id: null,
-          total: { $sum: "$amount" },
+          total: { $sum: 1 },
+        },
+      },
+    ]);
+    const payments = await bookingModel.aggregate([
+      {
+        $project: {
+          week: { $week: "$createdAt" },
+
+          year: { $year: "$createdAt" },
+          totalPrice: 1,
+        },
+      },
+      {
+        $match: {
+          year: year,
+          week: week,
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$totalPrice" },
         },
       },
     ]);
@@ -457,6 +655,27 @@ const getStatistics = async (req, res, next) => {
     ]);
 
     const dailyUsers = await userModel.aggregate([
+      {
+        $project: {
+          week: { $week: "$createdAt" },
+
+          year: { $year: "$createdAt" },
+        },
+      },
+      {
+        $match: {
+          year: year,
+        },
+      },
+      {
+        $group: {
+          _id: "$week",
+          total: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+    const dailyTransactions = await transactionModel.aggregate([
       {
         $project: {
           week: { $week: "$createdAt" },
@@ -505,7 +724,7 @@ const getStatistics = async (req, res, next) => {
           week: { $week: "$createdAt" },
 
           year: { $year: "$createdAt" },
-          amount: 1,
+          totalPrice: 1,
         },
       },
       {
@@ -516,18 +735,20 @@ const getStatistics = async (req, res, next) => {
       {
         $group: {
           _id: "$week",
-          total: { $sum: "$amount" },
+          total: { $sum: "$totalPrice" },
         },
       },
       { $sort: { _id: 1 } },
     ]);
     return res.send({
       users: users,
+      transactions: transactions,
       payments: payments,
       bookings: bookings,
       dailyUsers,
       dailyBookings,
       dailyPayments,
+      dailyTransactions,
     });
   }
   if (time == "monthly") {
@@ -552,6 +773,27 @@ const getStatistics = async (req, res, next) => {
         },
       },
     ]);
+    const transactions = await transactionModel.aggregate([
+      {
+        $project: {
+          month: { $month: "$createdAt" },
+
+          year: { $year: "$createdAt" },
+        },
+      },
+      {
+        $match: {
+          year: year,
+          month: month,
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: 1 },
+        },
+      },
+    ]);
     const bookings = await bookingModel.aggregate([
       {
         $project: {
@@ -579,7 +821,7 @@ const getStatistics = async (req, res, next) => {
           month: { $month: "$createdAt" },
 
           year: { $year: "$createdAt" },
-          amount: 1,
+          totalPrice: 1,
         },
       },
       {
@@ -591,12 +833,33 @@ const getStatistics = async (req, res, next) => {
       {
         $group: {
           _id: null,
-          total: { $sum: "$amount" },
+          total: { $sum: "$totalPrice" },
         },
       },
     ]);
 
     const dailyUsers = await userModel.aggregate([
+      {
+        $project: {
+          month: { $month: "$createdAt" },
+
+          year: { $year: "$createdAt" },
+        },
+      },
+      {
+        $match: {
+          year: year,
+        },
+      },
+      {
+        $group: {
+          _id: "$month",
+          total: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+    const dailyTransactions = await transactionModel.aggregate([
       {
         $project: {
           month: { $month: "$createdAt" },
@@ -645,7 +908,7 @@ const getStatistics = async (req, res, next) => {
           month: { $month: "$createdAt" },
 
           year: { $year: "$createdAt" },
-          amount: 1,
+          totalPrice: 1,
         },
       },
       {
@@ -656,18 +919,20 @@ const getStatistics = async (req, res, next) => {
       {
         $group: {
           _id: "$month",
-          total: { $sum: "$amount" },
+          total: { $sum: "$totalPrice" },
         },
       },
       { $sort: { _id: 1 } },
     ]);
     return res.send({
       users: users,
+      transactions: transactions,
       payments: payments,
       bookings: bookings,
       dailyUsers,
       dailyBookings,
       dailyPayments,
+      dailyTransactions,
     });
   }
 };
@@ -681,4 +946,7 @@ module.exports = {
   postSingleImage,
   adminUpdateUser,
   getStatistics,
+  getAllCars,
+  getAllBookings,
+  deleteLocation,
 };

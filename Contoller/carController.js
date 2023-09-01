@@ -45,7 +45,6 @@ const addCar = async (req, res) => {
 
 const getCar = async (req, res) => {
   try {
-    console.log("carsssss");
     let cars;
     if (req.query.sort === "low") {
       cars = await carModel.find({}).sort({ price: 1 });

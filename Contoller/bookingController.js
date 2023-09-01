@@ -246,8 +246,10 @@ const createBooking = async (req, res, next) => {
       price,
       insurance
     );
+    console.log("create bookinggggg ", total);
 
     const accessToken = await generateAccessToken();
+    console.log("create bookinggggg ", accessToken);
     const { data } = await axios.post(
       url,
       {

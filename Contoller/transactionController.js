@@ -1,22 +1,29 @@
 const transactionModel = require("../Model/Transaction");
+const APIFeatures = require("../utils/apiFeatures");
 
 const findAllTransaction = async (req, res) => {
   try {
-    const transaction = await transactionModel
-      .find({})
-      .populate("user")
-      .populate("booking");
+    const transactionCount = await transactionModel.countDocuments();
 
-    console.log(transaction);
-    if (!transaction) {
-      return res.status(404).json({
-        message: "no transaction exists",
-      });
+    const apiFeature = new APIFeatures(
+      transactionModel
+        .find()
+        .sort({ createdAt: -1 })
+        .populate("user")
+        .populate("booking"),
+      req.query
+    ).search("transactionId");
+
+    let transactions = await apiFeature.query;
+    let filteredTransactionCount = transactions.length;
+    if (req.query.resultPerPage && req.query.currentPage) {
+      apiFeature.pagination();
+
+      transactions = await apiFeature.query.clone();
     }
-    return res.status(200).json({
-      message: "here is all your transaction",
-      transaction: transaction,
-    });
+    res
+      .status(200)
+      .json({ transactions, transactionCount, filteredTransactionCount });
   } catch (error) {
     return res.status(500).json({
       message: "An error occured while fetching all the transaction",
