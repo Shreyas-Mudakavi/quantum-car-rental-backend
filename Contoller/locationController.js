@@ -35,17 +35,17 @@ const getLocation = async (req, res) => {
   try {
     const locations = await locationModel.findOne({});
     if (!locations) {
-      return res.status(404).json({
+      return res.status(200).json({
         message: "no such model found",
+        pickupLocations: [],
+        dropOffLocations: [],
       });
     }
-    return res
-      .status(200)
-      .json({
-        message: "all your location",
-        pickupLocations: locations.pickupLocations,
-        dropOffLocations: locations.dropOffLocations,
-      });
+    return res.status(200).json({
+      message: "all your location",
+      pickupLocations: locations.pickupLocations,
+      dropOffLocations: locations.dropOffLocations,
+    });
   } catch (error) {
     return res.status(500).json({
       message: "An error occured while fetching the location",

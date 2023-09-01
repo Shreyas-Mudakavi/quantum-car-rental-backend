@@ -45,6 +45,7 @@ const addCar = async (req, res) => {
 
 const getCar = async (req, res) => {
   try {
+    console.log("carsssss");
     let cars;
     if (req.query.sort === "low") {
       cars = await carModel.find({}).sort({ price: 1 });
@@ -58,14 +59,11 @@ const getCar = async (req, res) => {
       cars = await carModel.find({}).sort({ createdAt: -1 });
     }
 
-    if (!cars || cars.length === 0) {
-      return res.status(400).json({
-        message: "No cars found!",
-      });
-    }
-    if (req.query.sort === "desc") {
-      cars.reverse();
-    }
+    // if (!cars || cars.length === 0) {
+    //   return res.status(400).json({
+    //     message: "No cars found!",
+    //   });
+    // }
     res.status(200).json({
       message: "here is all car",
       cars: cars,
