@@ -258,7 +258,7 @@ const createBooking = async (req, res, next) => {
           {
             amount: {
               currency_code: "USD",
-              value: total,
+              value: total?.toFixed(2),
             },
           },
         ],
@@ -274,7 +274,7 @@ const createBooking = async (req, res, next) => {
 
     res.status(201).json({ order: data });
   } catch (error) {
-    console.log("create booking err ", error);
+    console.log("create booking err ", error.response.data);
     res.status(500).json(error);
   }
 };
