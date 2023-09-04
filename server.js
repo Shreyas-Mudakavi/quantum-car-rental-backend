@@ -7,6 +7,15 @@ connectDB();
 const Port = process.env.PORT || 5000;
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
+    credentials: true,
+  })
+);
+
 const userRouter = require("./Router/userRouter");
 const carRoute = require("./Router/carRoute");
 const bookingRoute = require("./Router/bookingRoute");
@@ -15,7 +24,7 @@ const adminRoute = require("./Router/adminRoute");
 const locationRoutes = require("./Router/locationRoutes");
 const queryRoutes = require("./Router/queryRoute");
 // console.log(bookingModel);
-app.use(cors());
+// app.use(cors());
 
 app.use("/api/user", userRouter);
 app.use("/api/location", locationRoutes);
