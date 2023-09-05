@@ -9,7 +9,7 @@ const {
   getBookingHistory,
   checkAvailability,
 } = require("../Contoller/bookingController");
-const auth = require("../Middleware/auth");
+const { auth } = require("../Middleware/auth");
 
 const router = express.Router();
 

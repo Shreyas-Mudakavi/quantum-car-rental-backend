@@ -15,7 +15,6 @@ router.get("/get-car", getCar);
 // router.post("/book-car", bookCar);
 router.post("/getAvail-car", getAvailableCar);
 router.get("/find-car/:id", findCarDetails);
-router.patch('/update-car/:id',updateCar);
-router.delete('/delete-car/:id',deleteCar)
+router.delete("/delete-car/:id", deleteCar);
 
 module.exports = router;
