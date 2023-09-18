@@ -3,6 +3,7 @@ const carModel = require("../Model/Cars");
 const addCar = async (req, res) => {
   try {
     console.log(req.body);
+
     const {
       name,
       price,
@@ -14,28 +15,32 @@ const addCar = async (req, res) => {
       model,
       brand,
       product_images,
+      features,
+      benefits,
     } = req.body;
 
     const new_car = new carModel({
       name: name,
-      price: price,
       details: details,
+      price: price,
+      images: product_images,
+      model: model,
+      noOfSeat: noOfSeat,
       speed: speed,
       gps: gps,
       automatic: automatic,
-      noOfSeat: noOfSeat,
-      model: model,
       brand: brand,
-      image: product_images,
+      features: features,
+      benefits: benefits,
     });
+
     const saved_car = await new_car.save();
-    console.log(saved_car);
+
     return res.status(201).json({
       message: "new car is created",
       car: saved_car,
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       message: "internal server error",
       error: error.message,
@@ -102,7 +107,7 @@ const findCarDetails = async (req, res) => {
 const updateCar = async (req, res) => {
   try {
     const carId = req.params.id;
-    console.log("update-car", carId);
+    console.log("update-car", req.body);
 
     const car = await carModel.findById(carId);
     if (!car) {
@@ -115,16 +120,15 @@ const updateCar = async (req, res) => {
       new: true,
     });
 
-    console.log("updated carrrrrr ", updatedCar);
+    // console.log("updated carrrrrr ", updatedCar);
 
     res.status(200).json({
       message: "updated car",
       car: updatedCar,
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
-      message: "An error occured while updating the user",
+      message: "An error occured while updating the car",
       error: error.message,
     });
   }

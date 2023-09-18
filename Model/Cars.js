@@ -12,49 +12,48 @@ const carSchema = new mongoose.Schema(
     },
     price: {
       type: Number,
+      required: true,
     },
-    image: {
-      type: String,
+    images: {
+      type: Array,
+      required: true,
     },
     model: {
       type: String,
+      required: true,
     },
     noOfSeat: {
       type: Number,
-    },
-    rating: {
-      type: Number,
+      required: true,
     },
     speed: {
       type: String,
+      required: true,
     },
     gps: {
       type: String,
-    },
-    seatType: {
-      type: String,
+      required: true,
     },
     automatic: {
       type: String,
+      required: true,
     },
     brand: {
       type: String,
+      required: true,
+    },
+
+    features: {
+      type: Array,
+      required: true,
+    },
+
+    benefits: {
+      type: Array,
+      required: true,
     },
 
     // features: [
-    //   {
-    //     name: {
-    //       type: String,
-    //       required: true,
-    //     },
-    //     description: {
-    //       type: String,
-    //       required: true,
-    //     },
-    //   },
-    // ],
-
-    // benefits: [
     //   {
     //     name: {
     //       type: String,

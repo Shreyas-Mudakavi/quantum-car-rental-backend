@@ -12,6 +12,7 @@ const {
   getAllCars,
   getAllBookings,
   deleteLocation,
+  postMultipleImages,
 } = require("../Contoller/adminController");
 const {
   findAllBooking,
@@ -46,7 +47,9 @@ router.post("/car/add-car", auth, isAdmin, addCar);
 router.get("/getAllCars", auth, isAdmin, getAllCars);
 router.get("/findCar/:id", auth, isAdmin, findCarDetails);
 router.put("/updateCar/:id", auth, isAdmin, updateCar);
+
 router.post("/image", upload.single("image"), postSingleImage);
+router.post("/multi-image", upload.array("image"), postMultipleImages);
 
 router.get("/all-booking", auth, isAdmin, getAllBookings);
 router.get("/get-booking/:id", auth, isAdmin, getBooking);

@@ -3,7 +3,7 @@ const userModel = require("../Model/Users");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv").config();
 const bcrypt = require("bcrypt");
-const { s3Uploadv2 } = require("../utils/s3");
+const { s3Uploadv2, s3UploadMulti } = require("../utils/s3");
 const bookingModel = require("../Model/Booking");
 const carModel = require("../Model/Cars");
 const locationModel = require("../Model/Location");
@@ -54,6 +54,9 @@ const adminLogin = async (req, res) => {
         message: "password does not match",
       });
     }
+
+    console.log("user", user);
+
     const token = jwt.sign({ userId: user._id }, secretKey, {
       expiresIn: "10h",
     });
@@ -63,6 +66,7 @@ const adminLogin = async (req, res) => {
       message: "user login successfully",
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       message: "An error occured while login",
       error: error.message,
@@ -129,6 +133,33 @@ const postSingleImage = async (req, res, next) => {
   const results = await s3Uploadv2(file);
   const location = results.Location && results.Location;
   return res.status(201).json({ data: { location } });
+};
+
+const postMultipleImages = async (req, res, next) => {
+  const files = req.files;
+
+  try {
+    if (files) {
+      const results = await s3UploadMulti(files);
+      console.log(results);
+
+      let location = [];
+      results.filter((result) => {
+        location.push(result.Location);
+      });
+
+      return res.status(201).json({ data: { location } });
+    } else {
+      return res.status(401).json({
+        message: "Invalid Image",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      message: "An error occured while adding images.",
+      error: error.message,
+    });
+  }
 };
 
 const adminUpdateUser = async (req, res) => {
@@ -951,4 +982,5 @@ module.exports = {
   getAllCars,
   getAllBookings,
   deleteLocation,
+  postMultipleImages,
 };
