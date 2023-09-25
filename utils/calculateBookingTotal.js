@@ -28,12 +28,26 @@ const calculateTotal = async (
     const timeDifferenceMilliseconds =
       journeyStartDateTime - journeyEndDateTime;
 
-    const days = Math.abs(timeDifferenceMilliseconds / (1000 * 60 * 60 * 24));
+    const days = Math.round(
+      Math.abs(timeDifferenceMilliseconds / (1000 * 60 * 60 * 24))
+    );
+
+    let additionalPay = 0;
 
     if (insurance) {
-      total = days * price + 35;
+      additionalPay = 35 + (days - 1) * 10;
+    } else {
+      additionalPay = 0;
+    }
+
+    if (insurance) {
+      total = days * price + additionalPay;
+
+      total = total + total * (15 / 100);
     } else {
       total = days * price;
+
+      total = total + total * (15 / 100);
     }
 
     return total;
