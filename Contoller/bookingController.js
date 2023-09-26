@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const { generateAccessToken } = require("../utils/paypal-api");
 const { calculateTotal } = require("../utils/calculateBookingTotal");
 const transactionModel = require("../Model/Transaction");
+const sendMail = require("../utils/sendMail");
 
 const base = "https://api-m.sandbox.paypal.com";
 
@@ -356,7 +357,8 @@ const capturePayment = async (req, res, next) => {
       transactionId: data.purchase_units[0].payments.captures[0].id,
     });
     const newTransaction = await transaction.save();
-    console.log("transaction...", newTransaction);
+
+    await sendMail(newTransaction.transactionId, total, car.name);
 
     res
       .status(200)
