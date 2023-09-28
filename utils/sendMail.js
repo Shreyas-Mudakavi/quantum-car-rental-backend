@@ -8,8 +8,6 @@ const sendMail = async (transactionId, total, carName) => {
       host: "smtp.ethereal.email",
       port: 587,
       auth: {
-        // user: "AKIAQMWC6RTIKBPYY2PT",
-        // pass: "BIUVlVuwK6r1LRBUd/iFFKnNViHe/bGctbZeoubfV7Qu",
         user: "katelin.lang94@ethereal.email",
         pass: "BGCmxcgN1J7MX7m84X",
       },
