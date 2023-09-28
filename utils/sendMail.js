@@ -4,17 +4,20 @@ const sendMail = async (transactionId, total, carName) => {
   try {
     let transporter = await nodemailer.createTransport({
       // service: "gmail",
+      // host: "ses-smtp-user.20230926-232508",
       host: "smtp.ethereal.email",
       port: 587,
       auth: {
+        // user: "AKIAQMWC6RTIKBPYY2PT",
+        // pass: "BIUVlVuwK6r1LRBUd/iFFKnNViHe/bGctbZeoubfV7Qu",
         user: "katelin.lang94@ethereal.email",
         pass: "BGCmxcgN1J7MX7m84X",
       },
     });
 
     const mailOptions = {
+      // from: "admin@carrentalpalmerstonnorth.co.nz",
       from: "<katelin.lang94@ethereal.email>",
-      // to: "shreyasmudak@gmail.com",
       to: `Carrentalpalmeraronnorth@gmail.com`,
       subject: "Palmerston North Car Rentals - <b>New Booking</b>",
       text: `New Booking Alert!`,

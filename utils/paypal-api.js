@@ -5,7 +5,8 @@ dotenv.config();
 
 const { CLIENT_ID, APP_SECRET } = process.env;
 
-const base = "https://api-m.sandbox.paypal.com";
+const base = "https://api-m.paypal.com";
+// const base = "https://api-m.sandbox.paypal.com";
 // generate access token
 const generateAccessToken = async () => {
   const auth = Buffer.from(CLIENT_ID + ":" + APP_SECRET).toString("base64");

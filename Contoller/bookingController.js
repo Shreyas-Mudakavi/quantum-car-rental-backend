@@ -8,7 +8,7 @@ const { calculateTotal } = require("../utils/calculateBookingTotal");
 const transactionModel = require("../Model/Transaction");
 const sendMail = require("../utils/sendMail");
 
-const base = "https://api-m.sandbox.paypal.com";
+const base = "https://api-m.paypal.com";
 
 const bookCar = async (req, res) => {
   const { carId, userId, startDate, endDate, startTime, endTime } = req.body;
