@@ -3,20 +3,15 @@ const nodemailer = require("nodemailer");
 const sendMailQuery = async (username, email) => {
   try {
     let transporter = await nodemailer.createTransport({
-      // service: "gmail",
-      // host: "ses-smtp-user.20230926-232508",
       host: "smtp.office365.com",
       port: 587,
       auth: {
         user: "admin@carrentalpalmerstonnorth.co.nz",
-        // user: "admin@carrentalpalmerstonnorth.co.nz",
         pass: "Carrental2023",
       },
     });
 
     const mailOptions = {
-      // from: "admin@carrentalpalmerstonnorth.co.nz",
-      // from: "<katelin.lang94@ethereal.email>",
       from: "admin@carrentalpalmerstonnorth.co.nz",
       to: `carrentalpalmeraronnorth@gmail.com`,
       subject: "Palmerston North Car Rentals - New Query",
