@@ -18,8 +18,7 @@ const sendMail = async (transactionId, total, carName) => {
       // from: "admin@carrentalpalmerstonnorth.co.nz",
       // from: "<katelin.lang94@ethereal.email>",
       from: "admin@carrentalpalmerstonnorth.co.nz",
-      to: `shreyasmudak@gmail.com`,
-      // to: `carrentalpalmeraronnorth@gmail.com`,
+      to: `carrentalpalmeraronnorth@gmail.com`,
       subject: "Palmerston North Car Rentals - New Booking",
       text: `New Booking Alert!`,
       html: `<html>

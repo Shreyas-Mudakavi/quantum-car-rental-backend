@@ -18,10 +18,9 @@ const sendMailQuery = async (username, email) => {
       // from: "admin@carrentalpalmerstonnorth.co.nz",
       // from: "<katelin.lang94@ethereal.email>",
       from: "admin@carrentalpalmerstonnorth.co.nz",
-      to: `shreyasmudak@gmail.com`,
-      // to: `carrentalpalmeraronnorth@gmail.com`,
+      to: `carrentalpalmeraronnorth@gmail.com`,
       subject: "Palmerston North Car Rentals - New Query",
-      text: `New Booking Alert!`,
+      text: `New Query Alert!`,
       html: `<html>
             <body>
               <p>Dear Admin,</p>
