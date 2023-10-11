@@ -325,7 +325,7 @@ const capturePayment = async (req, res, next) => {
     //   "payment capture... ",
     //   data.purchase_units[0].payments.captures[0].status
     // );
-    console.log("payment capture... data", data.id);
+    // console.log("payment capture... data", data.id);
 
     const booking = new bookingModel({
       car: carId,

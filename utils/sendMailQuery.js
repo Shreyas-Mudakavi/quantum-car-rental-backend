@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 
-const sendMail = async (transactionId, total, carName) => {
+const sendMailQuery = async (username, email) => {
   try {
     let transporter = await nodemailer.createTransport({
       // service: "gmail",
@@ -20,32 +20,22 @@ const sendMail = async (transactionId, total, carName) => {
       from: "admin@carrentalpalmerstonnorth.co.nz",
       to: `shreyasmudak@gmail.com`,
       // to: `carrentalpalmeraronnorth@gmail.com`,
-      subject: "Palmerston North Car Rentals - New Booking",
+      subject: "Palmerston North Car Rentals - New Query",
       text: `New Booking Alert!`,
       html: `<html>
-      <body>
-      <p>
-      Dear Admin, 
-      </p>
-      <p style='margin-top: 1rem'>
-      You got a new paid and confirmed car booking.
-      </p>
-      <div style='margin-top: 1rem'>
-      <p>
-      Transaction ID <strong>${transactionId}</strong>
-      </p>
-      <p>
-      Total amount paid - <strong>${total}</strong>
-      </p>
-      </div>
-      <p style='margin-top: 1rem'>
-      Car booked - <strong>${carName}</strong>
-      </p>
-      <div style='margin-top: 2rem'>
-      <p>Palmerston North Car Rentals</p>
-      </div>
-      </body>
-      </html>`,
+            <body>
+              <p>Dear Admin,</p>
+              <p style="margin-top: 1rem">You got a new query. <br /><br /><strong>User - </strong>${username} <br /><strong>Email - </strong> ${email}.</p>
+              <div style="margin-top: 1rem">
+                <p>
+                  Please login to Admin Panel to see the message.
+                </p>
+              </div>
+              <div style="margin-top: 2rem">
+                <p>Palmerston North Car Rentals</p>
+              </div>
+            </body>
+          </html>`,
     };
 
     let info = await transporter.sendMail(mailOptions, (err, info) => {
@@ -53,11 +43,11 @@ const sendMail = async (transactionId, total, carName) => {
         console.log("err ", err);
         return;
       }
-      console.log("Message sent ", info);
+      console.log("Message sent for query ", info);
     });
   } catch (error) {
     console.log("err sendMail ", error);
   }
 };
 
-module.exports = sendMail;
+module.exports = sendMailQuery;

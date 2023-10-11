@@ -1,5 +1,6 @@
 const queriesModel = require("../Model/Query");
 const APIFeatures = require("../utils/apiFeatures");
+const sendMailQuery = require("../utils/sendMailQuery");
 
 const addQuery = async (req, res, next) => {
   const { name, email, message } = req.body;
@@ -12,6 +13,8 @@ const addQuery = async (req, res, next) => {
     });
 
     const savedQuery = await newQuery.save();
+
+    await sendMailQuery(name, email);
 
     res.status(201).json({ savedQuery: savedQuery });
   } catch (error) {
