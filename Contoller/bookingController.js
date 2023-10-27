@@ -196,6 +196,7 @@ const calculateFare = async (req, res) => {
     const car = await carModel.findById(carId);
 
     const price = car.price;
+    const discount = car.discount;
 
     const total = await calculateTotal(
       startDate,
@@ -203,7 +204,8 @@ const calculateFare = async (req, res) => {
       startTime,
       endTime,
       price,
-      insurance
+      insurance,
+      discount
     );
 
     res.status(200).json({

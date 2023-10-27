@@ -1,10 +1,7 @@
 const carModel = require("../Model/Cars");
-const sendMail = require("../utils/sendMail");
 
 const addCar = async (req, res) => {
   try {
-    console.log(req.body);
-
     const {
       name,
       price,
@@ -15,6 +12,7 @@ const addCar = async (req, res) => {
       noOfSeat,
       model,
       brand,
+      discount,
       product_images,
       features,
       benefits,
@@ -31,6 +29,7 @@ const addCar = async (req, res) => {
       gps: gps,
       automatic: automatic,
       brand: brand,
+      discount: discount,
       features: features,
       benefits: benefits,
     });
@@ -108,7 +107,6 @@ const findCarDetails = async (req, res) => {
 const updateCar = async (req, res) => {
   try {
     const carId = req.params.id;
-    console.log("update-car", req.body);
 
     const car = await carModel.findById(carId);
     if (!car) {
@@ -120,8 +118,6 @@ const updateCar = async (req, res) => {
     const updatedCar = await carModel.findByIdAndUpdate(carId, req.body, {
       new: true,
     });
-
-    // console.log("updated carrrrrr ", updatedCar);
 
     res.status(200).json({
       message: "updated car",
@@ -138,7 +134,6 @@ const updateCar = async (req, res) => {
 const deleteCar = async (req, res) => {
   try {
     const carId = req.params.id;
-    console.log("delete-car", carId);
 
     const car = await carModel.findById(carId);
     if (!car) {

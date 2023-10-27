@@ -6,7 +6,8 @@ const calculateTotal = async (
   startTime,
   endTime,
   price,
-  insurance
+  insurance,
+  discount
 ) => {
   let total = 0;
 
@@ -44,10 +45,14 @@ const calculateTotal = async (
       total = days * price + additionalPay;
 
       total = total + total * (15 / 100);
+
+      total = total - total * (discount / 100);
     } else {
       total = days * price;
 
       total = total + total * (15 / 100);
+
+      total = total - total * (discount / 100);
     }
 
     return total;
